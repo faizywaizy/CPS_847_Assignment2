@@ -1,0 +1,26 @@
+sudo: required
+language: python
+services:
+- docker
+
+script:
+- docker image build -t nikkikapadia/cps847 .
+
+after_success:
+  #log in to docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #take built images and push to DOcker hub
+  - docker push nikkikapadia/cps847
+  #test
+
+deploy:
+  skip_cleanup: true
+  provider: elasticbeanstalk
+  access_key_id: "$AWS_ACCESS_KEY"
+  secret_access_key: "$AWS_SECRET_KEY"
+  region: "us-east-2"
+  app: "webapp"
+  env: "Webapp-env"
+  bucket_name: "elasticbeanstalk-us-east-2-317652771428"
+  on:
+    all_branches: true
