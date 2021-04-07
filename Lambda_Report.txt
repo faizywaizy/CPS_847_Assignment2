@@ -1,0 +1,47 @@
+**What is AWS Lambda?
+
+Typically, applications that are deployed require underlying servers to run that code. AWS Lambda allows functions to be run without those servers. 
+
+**What does our AWS Lambda function do?
+
+Our Lambda function was written in python, and this script takes a JSON file stored in an AWS S3 bucket, reads first and last name, and outputs a concatenated string (representing the whole name) along with the status code. 
+
+**The code:
+
+import boto3 # amazon python sdk
+import json
+
+def lambda_handler(event, context):
+    s3 = boto3.resource('s3') # s3 service object to work with
+    bucket = 'cbueno-cps847'
+    key = 'a2.json'
+    
+    file = s3.Object(bucket, key)
+    file_content = file.get()['Body'].read().decode('utf-8')
+    json_content = json.loads(file_content)
+    
+    fullName = json_content['first_name'] + " " + json_content['last_name']
+    
+    return {
+        'statusCode' : 200,
+        'output' : fullName
+    }
+
+
+**How does the code work?
+
+First we need to import the following modules: boto3, and json. Boto3 is the amazon python sdk, and is necessary to create and work with amazon s3 objects. The json module allows us to work with JSON data (such as the json.loads method).
+
+We define the function lambda_handler() that contains the code that we want to run when our lambda function gets called. We initalize the following objects:
+
+s3 (the s3 service object we want to interact with)
+bucket (the s3 bucket that contains our json file)
+key (the name of our json file)
+
+We can access our json file by passing the bucket and key to the s3.object() method. 
+
+File_content converts the contents of our file into a python string, then json_content parses the string and turns it into a dictionary. We can then access the first and last name by using the keys 'first_name' and 'last_name'. 
+
+Lastly, we concatenate and return the whole name. 
+
+
